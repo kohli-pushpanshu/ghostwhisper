@@ -17,7 +17,7 @@ export async function POST(request: Request){
        }
 
        const isCodeValid = user.verifyToken === code
-       const isCodeNotExpired = new Date(user.verifyTokenExpiry) > new Date()
+       const isCodeNotExpired = user.verifyTokenExpiry && new Date(user.verifyTokenExpiry) > new Date()
       
 
        if (isCodeValid && isCodeNotExpired) {

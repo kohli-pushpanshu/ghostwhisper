@@ -1,38 +1,50 @@
 import { prisma } from "../../../../../lib/prisma";
-import { getServerSession} from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function DELETE(
+  request: NextRequest, context:{ params: Promise<{ messageid: string }>}
+) {
+  const {messageid} = await context.params; 
 
 
-export async function DELETE(request:NextRequest, context : { params: { messageId: string }}){
-    const {messageId} = context.params;
+  const session = await getServerSession(authOptions);
 
-    const session = await getServerSession(authOptions)
-    const user = session?.user
-    const Id = Number(messageId)
-    
+  if (!session || !session.user) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Not authenticated",
+      },
+      { status: 401 }
+    );
+  }
 
-    if(!session||!session.user){
-        return Response.json({
-            success:false,
-            message:"not authenticated"
-        },{status:401})
-    }
-    const UserId = user?.username
-    const User = await prisma.user.findFirst({where:{username:UserId},select:{
-        id:true
-    }})
-    
+  const userId = Number(session.user.id);
 
 
-    try {
-        await prisma.message.deleteMany({where:{id:Id, userId: User?.id},})
-        return Response.json({
-            success:true,
-            message:"message deleted successfully",
-        },{status:200})
+  try {
+    await prisma.message.deleteMany({
+      where: { id: Number(messageid), userId: userId },
+    });
 
-    } catch (error) {
-        console.error("delete error",error)
-    }
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Message deleted successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Delete error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to delete message",
+        error: (error as Error).message,
+      },
+      { status: 500 }
+    );
+  }
 }

@@ -1,21 +1,22 @@
-import "next-auth";
+// types/next-auth.d.ts or anywhere inside your project (ensure tsconfig includes it)
+
+import { DefaultSession} from "next-auth";
 
 declare module "next-auth" {
   interface Session {
     user: {
-      _id: string;
+      id: string;
       email:string;
       username: string;
       isVerified: boolean;
-      isAcceptingMessage:boolean;
+      isAcceptingMessage: boolean;
     } & DefaultSession["user"];
   }
 
   interface User {
-    _id: string;
+    id: string;
+    email:string;
     username: string;
-    email: string;
-    password: string;
     isVerified: boolean;
     isAcceptingMessage: boolean;
   }
@@ -23,7 +24,8 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
-    _id: string;
+    id: string;
+    email:string;
     username: string;
     isVerified: boolean;
     isAcceptingMessage: boolean;

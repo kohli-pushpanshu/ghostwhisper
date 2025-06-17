@@ -6,6 +6,7 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   const user = session?.user;
 
+
   if (!session || !user) {
     return Response.json({
       success: false,
@@ -13,11 +14,11 @@ export async function GET() {
     }, { status: 401 });
   }
 
-  const userId = user?.email;
+  const userId = user?.username;
 
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { email: userId },
+      where: { username: userId },
       include: {
         messages: {
           orderBy: {

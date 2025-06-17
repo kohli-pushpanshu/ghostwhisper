@@ -46,8 +46,10 @@ export const authOptions: NextAuthOptions = {
           if (isPasswordCorrect) {
             return {
               id: user.id,
-              email: user.email,
-              name: user.username,
+              email:user.email,
+              username: user.username,
+              isVerified: user.isVerfied,
+              isAcceptingMessages: user.isAcceptingMessage
             } as unknown as AdapterUser;
           } else {
             throw new Error("Invalid password")
@@ -73,8 +75,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = user._id
+        token.id = user.id?.toString()
         token.isVerified = user.isVerified
+        token.email=user.email
         token.isAcceptingMessage = user.isAcceptingMessage
         token.username = user.username
       }
@@ -82,7 +85,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user._id = token._id
+        session.user.id = token.id
+        session.user.email=token.email
         session.user.isVerified = token.isVerified
         session.user.username = token.username
       }

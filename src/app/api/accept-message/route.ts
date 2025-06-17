@@ -18,11 +18,11 @@ export async function POST(request: Request){
         
     }
 
-    const userId = session.user?.email;
+    const userId = session.user?.username;
     const {acceptMessages} = await request.json()
 
     try {
-        const updateUser = await prisma.user.update({where:{email:userId},data:{isAcceptingMessage: acceptMessages}})
+        const updateUser = await prisma.user.update({where:{username:userId},data:{isAcceptingMessage: acceptMessages}})
         if(!updateUser){
             return Response.json({
                 success:false,
@@ -58,10 +58,10 @@ export async function GET(){
         
     }
 
-    const userId = user?.email;
+    const userId = user?.username;
 
     try {
-        const findUser = await prisma.user.findUnique({where:{email: userId}})
+        const findUser = await prisma.user.findUnique({where:{username: userId}})
     
         if(!findUser){
                 return Response.json({

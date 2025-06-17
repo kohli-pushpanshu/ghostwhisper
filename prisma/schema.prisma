@@ -31,7 +31,7 @@ model User {
   forgotPasswordToken       String?
   forgotPasswordTokenExpiry DateTime?
   verifyToken               String?
-  verifyTokenExpiry         DateTime?
+  verifyTokenExpiry         DateTime? @default(now())
   isAcceptingMessage        Boolean   @default(true)
   messages                  Message[]
 }
