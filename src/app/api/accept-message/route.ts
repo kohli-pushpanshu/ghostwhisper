@@ -20,9 +20,7 @@ export async function POST(request: Request){
     }
 
     const userId = session.user?.username;
-    console.log("userId",session.user, userId)
     const {acceptMessages} = await request.json()
-    console.log("accepting message", acceptMessages)
 
     try {
         const updateUser = await prisma.user.update({where:{username:userId},data:{isAcceptingMessage: acceptMessages}})
