@@ -4,8 +4,8 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import { NextRequest } from "next/server";
 
 
-export async function DELETE(request:NextRequest, context : { params: { messageid: string }}){
-    const messageId = context.params;
+export async function DELETE(request:NextRequest, context : { params: { messageId: string }}){
+    const {messageId} = context.params;
 
     const session = await getServerSession(authOptions)
     const user = session?.user
