@@ -24,7 +24,6 @@ export async function POST(request: Request){
 
     try {
         const updateUser = await prisma.user.update({where:{username:userId},data:{isAcceptingMessage: acceptMessages}})
-        console.log("updated user", updateUser)
         if(!updateUser){
             return Response.json({
                 success:false,
