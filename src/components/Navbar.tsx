@@ -2,7 +2,6 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { User } from 'next-auth';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -13,7 +12,7 @@ import { Search, X } from 'lucide-react';
 
 const Navbar = () => {
   const { data: session } = useSession();
-  const user: User = session?.user as User;
+  const user = session?.user;
   const pathname = usePathname();
 
   const [username, setUsername] = useState('');

@@ -1,9 +1,15 @@
-// lib/authOptions.ts or pages/api/auth/[...nextauth].ts
-
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "../../../../../lib/prisma"
+import { User } from "next-auth"
+import { AdapterUser } from "next-auth/adapters";
+
+
+interface CredentialsType {
+  identifier: string;
+  password: string;
+};
 
 
 
@@ -13,62 +19,70 @@ export const authOptions: NextAuthOptions = {
       id: "credentials",
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "you@example.com" },
+        email: { label: "Email", type: "text"},
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any): Promise<any> {
+      async authorize(
+        credentials):Promise<User | null> {
+        const creds = credentials as unknown as CredentialsType;
         try {
-          console.log('searching for email', credentials)
-            const user = await prisma.user.findFirst({where:{email:credentials.identifier}
-            });
+          const user = await prisma.user.findFirst({
+            where: { email: creds.identifier },
+          })
+          console.log("user",user)
 
-            console.log('[OPTIONS]: user', user)
+          if (!user) {
+            throw new Error("No user found with this email")
+          }
 
-            if(!user){
-                throw new Error('No User found with this email')
-            }
+          if (!user.isVerfied) {
+            throw new Error("Please verify your account before logging in")
+          }
 
-            if(!user.isVerfied){
-                throw new Error("Please verify your account before login")
-            }
-
-            const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password)
-            if (isPasswordCorrect) {
-                return user;
-            }else{
-              
-                throw new Error("Invalid password")
-            }
-
-        } catch (err: any) {
-            throw new Error(err)
+          const isPasswordCorrect = await bcrypt.compare(
+            creds.password,
+            user.password
+          )
+          if (isPasswordCorrect) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.username,
+            } as unknown as AdapterUser;
+          } else {
+            throw new Error("Invalid password")
+          }
+        } catch (err) {
+          console.error("Authorization error:", err)
+          return null
         }
       },
     }),
   ],
 
-
   pages: {
-    signIn: "/signIn",
+    signIn: "/signIn", 
   },
+
   session: {
     strategy: "jwt",
   },
-  secret:process.env.NEXTAUTH_SECRET,
+
+  secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token._id = user._id
-        token.isVerified = user.isVerfied;
-        token.isAcceptingMessage = user.isAcceptingMessage;
-        token.username=user.username
+        token.isVerified = user.isVerified
+        token.isAcceptingMessage = user.isAcceptingMessage
+        token.username = user.username
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user._id= token._id
+        session.user._id = token._id
         session.user.isVerified = token.isVerified
         session.user.username = token.username
       }

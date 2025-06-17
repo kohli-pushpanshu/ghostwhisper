@@ -1,5 +1,5 @@
 import { prisma } from "../../../../../lib/prisma";
-import { getServerSession, User } from "next-auth";
+import { getServerSession} from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import { NextRequest } from "next/server";
 
@@ -9,7 +9,7 @@ export async function DELETE(request:NextRequest, context : { params: { messagei
     const messageId = params.messageid;
 
     const session = await getServerSession(authOptions)
-    const user:User = session?.user as User
+    const user = session?.user
     const Id = Number(messageId)
     
 
@@ -19,7 +19,7 @@ export async function DELETE(request:NextRequest, context : { params: { messagei
             message:"not authenticated"
         },{status:401})
     }
-    const UserId = user.username
+    const UserId = user?.username
     const User = await prisma.user.findFirst({where:{username:UserId},select:{
         id:true
     }})

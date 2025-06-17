@@ -8,6 +8,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { messagesSchema } from "@/schemas/messageSchema";
 import { toast } from "sonner";
+import { UserProfile } from "@/types/profile";
 
 const Profile = () => {
   const params = useParams();
@@ -15,7 +16,7 @@ const Profile = () => {
 
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [message, setMessage] = useState("");
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [error, setError] = useState('');
