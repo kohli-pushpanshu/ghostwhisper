@@ -5,6 +5,7 @@ import { prisma } from "../../../../lib/prisma";
 
 
 
+
 export async function POST(request: Request){
     const session = await getServerSession(authOptions)
     const user = session?.user
@@ -19,10 +20,13 @@ export async function POST(request: Request){
     }
 
     const userId = session.user?.username;
+    console.log("userId",session.user, userId)
     const {acceptMessages} = await request.json()
+    console.log("accepting message", acceptMessages)
 
     try {
         const updateUser = await prisma.user.update({where:{username:userId},data:{isAcceptingMessage: acceptMessages}})
+        console.log("updated user", updateUser)
         if(!updateUser){
             return Response.json({
                 success:false,
@@ -31,8 +35,9 @@ export async function POST(request: Request){
         }
 
         return Response.json({
-                success:false,
-                message:"message acceptance status updated successfully"
+                success:true,
+                message:"message acceptance status updated successfully",
+                updateUser
             },{status:200}
         )
         
@@ -62,6 +67,7 @@ export async function GET(){
 
     try {
         const findUser = await prisma.user.findUnique({where:{username: userId}})
+
     
         if(!findUser){
                 return Response.json({

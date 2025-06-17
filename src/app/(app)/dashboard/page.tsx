@@ -24,20 +24,22 @@ const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
+  const [acceptMessages, setAcceptMessages] = useState(false);
+
 
   const form = useForm({
     resolver: zodResolver(acceptMessagesSchema),
     defaultValues: { acceptMessages: false },
   });
 
-  const { register, watch, setValue } = form;
-  const acceptMessages = watch("acceptMessages");
+  const {setValue } = form;
+
 
   const fetchAcceptMessage = useCallback(async () => {
     setIsSwitchLoading(true);
     try {
       const response = await axios.get("/api/accept-message");
-      setValue("acceptMessages", response.data.isAcceptingMessage);
+      setAcceptMessages(response.data.message);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast.error(axiosError.response?.data.message || "Failed to fetch settings");
@@ -66,18 +68,6 @@ const Page = () => {
     }
   }, [session, fetchAcceptMessage, fetchMessages]);
 
-  const handleSwitchChange = async () => {
-    try {
-      const response = await axios.post<ApiResponse>("/api/accept-message", {
-        acceptMessages: !acceptMessages,
-      });
-      setValue("acceptMessages", !acceptMessages);
-      toast.success(response.data.message);
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(axiosError.response?.data.message || "Failed to update setting");
-    }
-  };
 
   const handleDeleteMessages = (messageId: string) => {
     setMessages((prev) => prev.filter((m) => m.id.toString() !== messageId));
@@ -112,11 +102,24 @@ const Page = () => {
         </Label>
         <Switch
           id="acceptMessages"
-          {...register("acceptMessages")}
           checked={acceptMessages}
-          onCheckedChange={handleSwitchChange}
-          disabled={isSwitchLoading}
-        />
+          onCheckedChange={async (checked: boolean) => {
+          setIsSwitchLoading(true);
+          try {
+            const response = await axios.post('/api/accept-message', {
+              acceptMessages: checked,
+            });
+            setAcceptMessages(response.data.isAcceptingMessage);
+            toast.success(response.data.message);
+          } catch (error) {
+            const axiosError = error as AxiosError<ApiResponse>;
+            toast.error(axiosError.response?.data.message || "Failed to update setting");
+          } finally {
+            setIsSwitchLoading(false);
+          }
+        }}
+        disabled={isSwitchLoading}
+      />
       </div>
 
       {/* Messages Header */}
