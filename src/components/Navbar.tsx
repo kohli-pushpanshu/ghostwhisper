@@ -9,7 +9,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Search, X } from 'lucide-react';
 
-
 const Navbar = () => {
   const { data: session } = useSession();
   const user = session?.user;
@@ -43,7 +42,6 @@ const Navbar = () => {
     fetchSuggestions();
   }, [username]);
 
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -53,7 +51,7 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   return (
     <nav className="w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -86,7 +84,7 @@ const Navbar = () => {
                   />
                   {suggestion.length > 0 && (
                     <div className="mt-1 bg-white border border-gray-200 rounded-md shadow max-h-40 overflow-y-auto">
-                      {suggestion.map((user: { username: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: React.Key | null | undefined) => (
+                      {suggestion.map((user: { username: string }, index: number) => (
                         <Link
                           href={`/u/${user.username}`}
                           key={index}
@@ -103,12 +101,17 @@ const Navbar = () => {
             </div>
           )}
 
-
           {session ? (
             <>
-              <Link href={'/dashboard'}><span className="text-sm text-gray-700 hidden sm:inline">
-                Welcome, <span className="font-medium">{user?.username || user?.email}</span>
-              </span></Link>
+              <Link href="/dashboard" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-semibold text-gray-700">
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <span className="text-sm text-gray-700 hidden sm:inline">
+                  {user?.username || user?.email}
+                </span>
+              </Link>
+
               <Button
                 variant="outline"
                 onClick={() => signOut()}
