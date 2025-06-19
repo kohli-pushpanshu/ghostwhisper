@@ -71,6 +71,7 @@ const Profile = () => {
     }
   };
 
+
   return (
     <main className="min-h-screen bg-gray-100 py-12 px-4">
       <div className="max-w-3xl mx-auto space-y-10">
@@ -92,7 +93,7 @@ const Profile = () => {
               <p><span className="font-semibold">Username:</span> {profile?.username}</p>
               <p><span className="font-semibold">Email:</span> <span className="text-sm italic text-gray-500">Private</span></p>
               <p><span className="font-semibold">Accepting Messages:</span> {profile?.isAcceptingMessage ? "Yes" : "No"}</p>
-              <p><span className="font-semibold">Verified:</span> {profile?.isVerified ? "Yes" : "No"}</p>
+              <p><span className="font-semibold">Verified:</span> {profile?.isVerfied ? "Yes" : "No"}</p>
             </div>
           </CardContent>
         </Card>
